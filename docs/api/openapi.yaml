@@ -1,0 +1,29 @@
+openapi: 3.0.0
+info:
+  title: KursLight VPN Management System
+  description: API for managing VPN servers, users, and certificates
+  version: 1.0.0
+servers:
+  - url: https://localhost:5000
+    description: Production server
+paths:
+  /api/auth/login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Invalid credentials
+  # ... и так далее для всех эндпоинтов

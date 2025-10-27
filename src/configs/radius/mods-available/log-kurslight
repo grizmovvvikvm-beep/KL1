@@ -1,0 +1,25 @@
+# Logging Module for KursLight
+log_kurslight {
+    # Destination files
+    auth_log = "/opt/kurs-light/logs/radius/auth.log"
+    auth_badpass = "/opt/kurs-light/logs/radius/auth_badpass.log"
+    auth_goodpass = "/opt/kurs-light/logs/radius/auth_goodpass.log"
+    
+    # Log format
+    strip_names = no
+    permitted_peer = ""
+    
+    # Authentication request log
+    auth {
+        enabled = yes
+        destination = files
+        messages = "yes"
+    }
+    
+    # Authentication response log  
+    auth_response {
+        enabled = yes
+        destination = files
+        messages = "yes"
+    }
+}

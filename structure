@@ -1,0 +1,36 @@
+kurs-light-vpn/
+├── .gitlab-ci.yml                 # CI/CD конфигурация
+├── README.md                      # Документация
+├── INSTALL.md                     # Инструкция по установке
+├── scripts/
+│   ├── install.sh                 # Главный скрипт установки
+│   ├── functions/
+│   │   ├── dependencies.sh        # Установка зависимостей
+│   │   ├── database.sh            # Настройка БД
+│   │   ├── ssl.sh                 # SSL сертификаты
+│   │   ├── openvpn.sh             # OpenVPN настройка
+│   │   ├── backend.sh             # Backend установка
+│   │   ├── frontend.sh            # Frontend установка
+│   │   └── system.sh              # Системные настройки
+│   └── utils/
+│       ├── helpers.sh             # Вспомогательные функции
+│       └── logging.sh             # Логирование
+├── src/
+│   ├── backend/
+│   │   ├── app.py                 # Основное приложение
+│   │   ├── requirements.txt       # Python зависимости
+│   │   └── config/
+│   │       └── systemd.service    # systemd service файл
+│   ├── frontend/
+│   │   └── index.html             # Веб-интерфейс
+│   └── configs/
+│       ├── nginx.conf             # Nginx конфигурация
+│       ├── config.xml             # Основной конфиг
+│       └── syslog.conf            # Syslog конфигурация
+├── tests/
+│   ├── test_installation.sh       # Тесты установки
+│   └── test_functionality.sh      # Тесты функциональности
+└── docs/
+    ├── deployment.md              # Деплоймент
+    ├── configuration.md           # Конфигурация
+    └── troubleshooting.md         # Решение проблем

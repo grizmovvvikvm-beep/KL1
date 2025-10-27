@@ -1,0 +1,53 @@
+# OpenVPN RADIUS Plugin Configuration
+# For authentication and accounting with RADIUS server
+
+server
+{
+    # RADIUS server configuration
+    name=127.0.0.1
+    authport=1812
+    acctport=1813
+    retry=1
+    wait=1
+    sharedsecret=radius_secret
+}
+
+client
+{
+    # NAS identifier
+    name=kurs-light-vpn
+    vsa=openvpn
+}
+
+acct
+{
+    # Accounting interval in seconds
+    acctinterval=600
+    
+    # Session timeout handling
+    sessiontimeout=3600
+    
+    # NAS port type (for RADIUS)
+    nasporttype=5
+}
+
+# Vendor-Specific Attributes (VSAs)
+vsa
+{
+    # OpenVPN specific attributes
+    openvpn.0=0
+    openvpn.1=1
+}
+
+# Logging configuration
+log
+{
+    # Enable logging
+    log=1
+    
+    # Log destination
+    destination=syslog
+    
+    # Syslog facility
+    syslog=facility
+}

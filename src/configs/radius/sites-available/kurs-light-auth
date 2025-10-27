@@ -1,0 +1,63 @@
+# KursLight RADIUS Authentication Site
+server kurs-light-auth {
+    listen {
+        type = auth
+        ipaddr = *
+        port = 0
+        limit {
+            max_connections = 16
+            lifetime = 0
+            idle_timeout = 30
+        }
+    }
+    
+    authorize {
+        # Pre-process the request
+        preprocess
+        
+        # Log authentication attempts
+        auth_log
+        suffix
+        eap {
+            ok = return
+        }
+        
+        # SQL authentication
+        sql
+        
+        # Pap authentication
+        pap
+    }
+    
+    authenticate {
+        Auth-Type PAP {
+            pap
+        }
+        Auth-Type CHAP {
+            chap
+        }
+        Auth-Type MS-CHAP {
+            mschap
+        }
+        Auth-Type PEAP {
+            eap
+        }
+    }
+    
+    post-auth {
+        # Log post-authentication
+        postauth_log
+        
+        # SQL logging
+        sql
+        
+        # Remove reply message for security
+        remove_reply_message_if_eap
+        
+        # Handle rejected requests
+        Post-Auth-Type REJECT {
+            attr_filter.access_reject
+            sql
+        }
+    }
+}

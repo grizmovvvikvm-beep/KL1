@@ -1,0 +1,51 @@
+# SQL Module Configuration for KursLight
+sql kurslight_sql {
+    driver = "rlm_sql_postgresql"
+    dialect = "postgresql"
+    
+    # Connection info
+    server = "localhost"
+    port = 5432
+    login = "kurslight_radius"
+    password = "${env:RADIUS_DB_PASSWORD}"
+    radius_db = "kurslight_radius"
+    
+    # Table configuration
+    acct_table1 = "radacct"
+    acct_table2 = "radacct"
+    postauth_table = "radpostauth"
+    authcheck_table = "radcheck"
+    authreply_table = "radreply"
+    groupcheck_table = "radgroupcheck"
+    groupreply_table = "radgroupreply"
+    usergroup_table = "radusergroup"
+    
+    read_groups = yes
+    read_clients = no
+    
+    # Connection pool
+    pool {
+        start = 5
+        min = 4
+        max = 32
+        spare = 3
+        uses = 0
+        retry_delay = 30
+        lifetime = 0
+        idle_timeout = 60
+    }
+    
+    # Group configuration
+    read_clients = no
+    group_attribute = "SQL-Group"
+    
+    # TLS configuration (if needed)
+    # tls {
+    #     ca_file = "/etc/raddb/certs/ca.pem"
+    #     certificate_file = "/etc/raddb/certs/server.crt"
+    #     private_key_file = "/etc/raddb/certs/server.key"
+    # }
+    
+    # Remove SQL queries from logs
+    suppress_sql_errors = no
+}
