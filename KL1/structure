@@ -1,0 +1,34 @@
+kurs-light-vpn/
+├── src/
+│   ├── backend/
+│   │   ├── config_manager.py          # Configuration management
+│   │   ├── migrate.py                 # Database migrations
+│   │   ├── log_manager.py             # Advanced logging
+│   │   ├── notifications.py           # Notification system
+│   │   ├── performance.py             # Performance monitoring
+│   │   ├── rate_limiting.py           # API rate limiting
+│   │   └── migrations/                # Database migration files
+│   │       ├── 20240101000000_initial.sql
+│   │       └── 20240102000000_add_radius.sql
+│   └── frontend/
+│       ├── js/
+│       │   ├── performance.js         # Performance charts
+│       │   └── notifications.js       # Notification settings
+│       └── css/
+│           └── performance.css        # Performance dashboard styles
+├── scripts/
+│   ├── maintenance/
+│   │   ├── cleanup-logs.sh           # Log cleanup
+│   │   ├── renew-certs.sh            # Certificate renewal
+│   │   └── backup-rotation.sh        # Backup management
+│   └── monitoring/
+│       ├── health-check.py           # Health checks
+│       └── metrics-collector.py      # Metrics collection
+└── docs/
+    ├── api/
+    │   └── rate-limiting.md          # Rate limiting documentation
+    ├── operations/
+    │   ├── monitoring.md             # Monitoring guide
+    │   └── troubleshooting.md        # Troubleshooting guide
+    └── development/
+        └── adding-migrations.md      # How to add database migrations

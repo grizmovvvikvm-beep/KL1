@@ -1,0 +1,36 @@
+# KursLight RADIUS Accounting Site
+server kurs-light-acct {
+    listen {
+        type = acct
+        ipaddr = *
+        port = 0
+    }
+    
+    recv Accounting-Request {
+        &control.Proxy-To-Realm := "localhost"
+    }
+    
+    preacct {
+        preprocess
+        acct_unique
+        suffix
+        files
+    }
+    
+    accounting {
+        detail
+        sql
+        exec
+        attr_filter.accounting_response
+    }
+    
+    recv-coa {
+        # Handle CoA requests
+        sql
+        handler
+    }
+    
+    send-coa {
+        # Send CoA requests  
+    }
+}

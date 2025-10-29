@@ -1,0 +1,20 @@
+# KursLight VPN RADIUS Dictionary
+# Custom Vendor-Specific Attributes (VSAs)
+
+ATTRIBUTE KursLight-VPN-User-Role 3000 string
+ATTRIBUTE KursLight-VPN-Group 3001 string
+ATTRIBUTE KursLight-VPN-Instance 3002 string
+ATTRIBUTE KursLight-Max-Connections 3003 integer
+ATTRIBUTE KursLight-Bandwidth-Limit 3004 integer
+ATTRIBUTE KursLight-Session-Timeout 3005 integer
+ATTRIBUTE KursLight-Access-Hours 3006 string
+
+VALUE KursLight-VPN-User-Role admin 1
+VALUE KursLight-VPN-User-Role user 2
+VALUE KursLight-VPN-User-Role guest 3
+
+# Bandwidth limits (in Mbps)
+VALUE KursLight-Bandwidth-Limit unlimited 0
+VALUE KursLight-Bandwidth-Limit basic 10
+VALUE KursLight-Bandwidth-Limit premium 100
+VALUE KursLight-Bandwidth-Limit enterprise 1000

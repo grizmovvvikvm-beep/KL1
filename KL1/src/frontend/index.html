@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>KursLight - VPN Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+    <style>
+        :root { --bg:#0f1724; --card:#0b1220; --accent:#0ea5a4; --muted:#94a3b8; --text:#e6eef6; }
+        html,body{height:100%;margin:0;font-family:Inter,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text);}
+        .app {display:flex;height:100vh;overflow:hidden;}
+        .sidebar{width:250px;background:linear-gradient(180deg,#071029,#0b1220);padding:20px;box-sizing:border-box}
+        .brand{font-weight:700;font-size:18px;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+        .nav{list-style:none;padding:0;margin:0}
+        .nav li{margin:6px 0}
+        .nav a{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;color:var(--muted);text-decoration:none}
+        .nav a.active, .nav a:hover{background:rgba(255,255,255,0.03);color:var(--text)}
+        .submenu{margin-left:8px;margin-top:6px;display:none;flex-direction:column}
+        .nav li.open > .submenu{display:flex}
+        .submenu a{padding:8px 10px;border-radius:6px;font-size:13px}
+        .main{flex:1;padding:20px;overflow:auto}
+        .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+        .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+        .card{background:var(--card);padding:16px;border-radius:8px;box-shadow:0 1px 0 rgba(255,255,255,0.02)}
+        .card h4{margin:0 0 8px 0;color:var(--muted);font-size:13px}
+        .gauge{font-size:28px;font-weight:700}
+        .progress{background:rgba(255,255,255,0.04);height:12px;border-radius:6px;overflow:hidden}
+        .progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7dd3fc)}
+        .small {font-size:13px;color:var(--muted)}
+        table {width:100%;border-collapse:collapse;color:var(--text)}
+        th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px}
+        th{color:var(--muted);font-size:12px}
+        .toggle {display:inline-block;width:12px;height:12px;border-radius:3px;background:#374151;margin-right:8px;vertical-align:middle}
+        .toggle.on {background:var(--accent)}
+        button {background:#0b1220;border:1px solid rgba(255,255,255,0.03);color:var(--text);padding:6px 10px;border-radius:6px;cursor:pointer}
+        button:hover {opacity:0.9}
+        /* rules tabs */
+        .rules-tabs {display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+        .rules-tab {padding:8px 12px;border-radius:6px;background:rgba(255,255,255,0.02);cursor:pointer}
+        .rules-tab.active {background:var(--accent);color:#062023}
+        /* modal form overlay */
+        .overlay {position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999}
+        .form-card {background:var(--card);padding:18px;border-radius:8px;max-width:900px;width:95%;color:var(--text);max-height:90vh;overflow:auto}
+        .form-row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+        .form-row label{min-width:140px;color:var(--muted);font-size:13px}
+        .form-row input[type="text"], .form-row select, .form-row textarea {flex:1;padding:6px;border-radius:4px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
+        .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+        .small-muted{color:var(--muted);font-size:12px}
+    </style>
+</head>
+<body>
+    <div id="loginScreen" style="display:none"></div>
+
+    <div id="mainApp" class="app">
+        <aside class="sidebar">
+            <div class="brand"><i class="fa-solid fa-shield-virus"></i> KursLight</div>
+            <ul class="nav" id="mainNav">
+                <li><a href="#" class="active" data-section="dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="#" data-section="users"><i class="fa-solid fa-users"></i> Users</a></li>
+                <li><a href="#" data-section="vpn"><i class="fa-solid fa-network-wired"></i> VPN Instances</a></li>
+                <li>
+                    <a href="#" class="has-sub" data-section="firewall"><i class="fa-solid fa-firewall"></i> Firewall <i class="fa-solid fa-caret-down" style="margin-left:auto"></i></a>
+                    <div class="submenu">
+                        <a href="#" data-subsection="aliases">Aliases</a>
+                        <a href="#" data-subsection="rules">Rules</a>
+                        <a href="#" data-subsection="groups">Groups</a>
+                    </div>
+                </li>
+                <li><a href="#" data-section="certs"><i class="fa-solid fa-certificate"></i> Certificates</a></li>
+                <li><a href="#" data-section="system"><i class="fa-solid fa-server"></i> System</a></li>
+            </ul>
+        </aside>
+
+        <main class="main">
+            <div class="header">
+                <h2 id="pageTitle">Dashboard</h2>
+                <div class="small">Пользователь: admin</div>
+            </div>
+
+            <section id="viewDashboard">
+                <div class="cards" id="metrics">
+                    <div class="card">
+                        <h4>CPU</h4>
+                        <div class="gauge" id="cpuGauge">-- %</div>
+                        <div class="small">Загрузка процессора</div>
+                    </div>
+
+                    <div class="card">
+                        <h4>Memory</h4>
+                        <div class="progress" style="margin:10px 0"><i id="memoryBar" style="width:0%"></i></div>
+                        <div class="small" id="memoryText">-- / --</div>
+                    </div>
+
+                    <div class="card">
+                        <h4>Active Connections</h4>
+                        <div class="gauge" id="activeConnections">--</div>
+                        <div class="small">Текущие VPN-соединения</div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom:20px">
+                    <h4>Alerts</h4>
+                    <div id="alertsList" class="small">Нет предупреждений</div>
+                </div>
+            </section>
+
+            <section id="viewFirewall" style="display:none">
+                <div class="card" style="margin-bottom:16px">
+                    <h4>Firewall / Aliases & Rules</h4>
+                    <div class="small">Управление алиасами и правилами фаервола (система / VPN-инстансы).</div>
+                </div>
+
+                <div class="card" id="aliasesCard">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                        <div class="small">Список алиасов</div>
+                        <div>
+                            <button id="addAliasBtn">Добавить алиас</button>
+                        </div>
+                    </div>
+                    <div style="overflow:auto">
+                        <table id="aliasesTable">
+                            <thead>
+                                <tr>
+                                    <th>Enabled</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Host(s)</th>
+                                    <th>Categories</th>
+                                    <th>Content</th>
+                                    <th>Statistics</th>
+                                    <th>Description</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- rows loaded by firewall.js -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="rulesCard" class="card" style="margin-top:16px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                        <div class="small">Rules</div>
+                        <div>
+                            <button id="addRuleGlobalBtn">Добавить правило</button>
+                        </div>
+                    </div>
+
+                    <div class="rules-tabs" id="rulesTabs">
+                        <div class="rules-tab active" data-scope="WAN">WAN</div>
+                        <div class="rules-tab" data-scope="OVPN">OVPN</div>
+                        <!-- dynamic OVPN-instance tabs appended here -->
+                    </div>
+
+                    <div style="overflow:auto">
+                        <table id="rulesTable">
+                            <thead>
+                                <tr>
+                                    <th>Enabled</th><th>Name</th><th>Action</th><th>Interface</th>
+                                    <th>Direction</th><th>Protocol</th><th>Source</th><th>Destination</th><th>VPN Instance</th><th></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+            <section id="contentPlaceholder" style="display:none" class="card">
+                <h4>Details</h4>
+                <div class="small">Выберите раздел слева для управления.</div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script src="js/firewall.js"></script>
+    <script>
+    // Навигация и подменю
+    document.querySelectorAll('.nav > li > a').forEach(a=>{
+        a.addEventListener('click', e=>{
+            const parentLi = a.closest('li');
+            const hasSub = parentLi && parentLi.querySelector('.submenu');
+            if (hasSub) {
+                parentLi.classList.toggle('open');
+                return;
+            }
+            e.preventDefault();
+            document.querySelectorAll('.nav a').forEach(n=>n.classList.remove('active'));
+            a.classList.add('active');
+            const section = a.dataset.section;
+            _showSection(section);
+        });
+    });
+
+    document.querySelectorAll('.submenu a').forEach(sa=>{
+        sa.addEventListener('click', e=>{
+            e.preventDefault();
+            document.querySelectorAll('.nav a').forEach(n=>n.classList.remove('active'));
+            const parent = sa.closest('li'); if(parent){ parent.querySelector('a').classList.add('active'); }
+            sa.classList.add('active');
+            const sub = sa.dataset.subsection;
+            _showSection('firewall');
+            _showFirewallSub(sub);
+            if(typeof initFirewallUI === 'function') initFirewallUI();
+        });
+    });
+
+    function _showSection(name){
+        document.getElementById('pageTitle').textContent = name ? name.charAt(0).toUpperCase()+name.slice(1) : 'Dashboard';
+        document.getElementById('viewDashboard').style.display = (name === 'dashboard') ? '' : 'none';
+        document.getElementById('viewFirewall').style.display = (name === 'firewall') ? '' : 'none';
+        document.getElementById('contentPlaceholder').style.display = (!name || ['dashboard','firewall'].includes(name)) ? 'none' : '';
+    }
+
+    function _showFirewallSub(sub){
+        // rules/aliases handled in firewall.js
+    }
+
+    if(typeof startLiveMetrics === 'function') startLiveMetrics();
+
+    // addRuleGlobalBtn bound in firewall.js.initFirewallUI() but keep safe fallback
+    document.getElementById('addRuleGlobalBtn')?.addEventListener('click', ()=> {
+        if(typeof openRuleForm === 'function') openRuleForm();
+    });
+    </script>
+</body>
+</html>
